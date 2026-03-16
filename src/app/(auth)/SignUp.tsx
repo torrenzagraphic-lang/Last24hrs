@@ -1,7 +1,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
@@ -9,17 +9,31 @@ export default function SignUpScreen() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    const [isLoading, SetIsLoading] = useState(false);
     const router = useRouter();
-    const {signUp} = useAuth();
-    const handleSignUp = async () =>{
-        if(!email || !password){
-            Alert.alert('Error',"Please fill in all fields")
+    const { signUp } = useAuth();
+
+
+    const handleSignUp = async () => {
+        if (!email || !password) {
+            Alert.alert('Error', "Please fill in all fields")
         }
 
-        if(password && password.length < 3){
-            Alert.alert("Error",'Please enter a password minimum 4 chr')
+        if (password && password.length < 3) {
+            Alert.alert("Error", 'Please enter a password minimum 4 chr')
         }
-    } 
+
+        SetIsLoading(true);
+        try {
+            await signUp(email, password);
+        } catch (error) {
+            Alert.alert("Error", "Failed to sign Up. Please try again")
+        }
+        finally {
+            SetIsLoading(false);
+        }
+    }
     return (
         <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
             <View style={styles.content}>
@@ -44,7 +58,11 @@ export default function SignUpScreen() {
                         style={styles.input} />
 
                     <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-                        <Text style={styles.buttonText}>Sign up </Text>
+                        {isLoading ? (
+                            <ActivityIndicator size={24} color='#fff' />
+                        ) : (
+                            <Text style={styles.buttonText}>Sign up </Text>
+                        )}
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.LinkButton} onPress={() => router.push('/(auth)/Login')}>
                         <Text style={styles.LinkButtonTextL}>Already have an account!

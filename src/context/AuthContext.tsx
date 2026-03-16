@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (error) throw error;
 
         if (data.user) {
-            console.log(user)
+            console.log(data.user)
         }
 
     }
