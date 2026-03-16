@@ -1,3 +1,4 @@
+import { supabase } from '@/lib/supabase/Client';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
@@ -34,8 +35,62 @@ export default function SignUpScreen() {
         }
     }
 
-    const handleComplete = () => {
+    const takePhoto = async () => {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert(
+                "Permission needed",
+                "We need camera permission to take a photo."
+            );
+            return;
+        }
 
+
+        const result = await ImagePicker.launchCameraAsync({
+            allowsEditing: false,
+            aspect: [1, 1],
+            quality: 0.8,
+        });
+        if (!result.canceled && result.assets[0]) {
+            setProfile(result.assets[0].uri)
+        }
+    };
+
+    const showImagePicker = () => {
+        Alert.alert('Select Profile Image', 'Choose an option', [
+            { text: 'Camera', onPress: takePhoto },
+            { text: 'Upload from Media', onPress: pickImage },
+            { text: 'Cancel', style: 'cancel' }
+        ])
+    }
+
+    const handleComplete = async () => {
+        if (!name || !username) {
+            Alert.alert('Error', "Please fill in all fields")
+        }
+
+        if (username.length < 3) {
+            Alert.alert("Error", 'Please enter a username minimum 4 chr')
+        }
+
+
+        setIsLoading(true);
+        try {
+            const { data: existingUser } = await supabase.from('profiles').select('id').eq('username', username);
+
+            if(existingUser){
+                Alert.alert("Error","This username is already taken, Please choose another one.");
+            }
+
+        } catch (error) {
+            Alert.alert("Error", "Failed to complete onboarding. Please try again");
+
+            setIsLoading(false);
+            return;
+        }
+        finally {
+            setIsLoading(false);
+        }
     };
     return (
         <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
@@ -48,8 +103,8 @@ export default function SignUpScreen() {
                 </View>
 
                 <View style={styles.form}>
-                    <TouchableOpacity style={styles.imageContainer} onPress={pickImage}>
-                        {profile ? (<Image source={{ uri: profile }} style={styles.profile}/>
+                    <TouchableOpacity style={styles.imageContainer} onPress={showImagePicker}>
+                        {profile ? (<Image source={{ uri: profile }} style={styles.profile} />
                         ) : (
                             <View style={styles.placeholderImage}>
                                 <Text style={styles.placeholderText}>+</Text>
@@ -119,10 +174,11 @@ const styles = StyleSheet.create({
         marginBottom: 32,
         position: 'relative',
     },
-    profile:{
-        width:120,
-        height:120,
-        borderRadius:60,
+    profile: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        backgroundColor: '#f5f5f5'
     },
     placeholderImage: {
         width: 120,
