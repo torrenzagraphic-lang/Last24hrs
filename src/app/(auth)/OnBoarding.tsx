@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -8,12 +9,12 @@ export default function SignUpScreen() {
 
     const [name, setName] = useState("");
     const [username, setUsername] = useState("");
-    const [isloading, setIsLoading] = useState("");
+    const [isloading, setIsLoading] = useState(false);
     const [profile, setProfile] = useState("");
 
-    const pickImage = async() =>{
-        const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if(status !== 'granted'){
+    const pickImage = async () => {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
             Alert.alert(
                 "Permission needed",
                 "We need camera roll permission to select a profile image."
@@ -23,12 +24,12 @@ export default function SignUpScreen() {
 
 
         const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes:['images'],
-            allowsEditing:true,
-            aspect:[1,1],
-            quality:0.8,
+            mediaTypes: ['images'],
+            allowsEditing: false,
+            aspect: [1, 1],
+            quality: 0.8,
         });
-        if(!result.canceled && result.assets[0]){
+        if (!result.canceled && result.assets[0]) {
             setProfile(result.assets[0].uri)
         }
     }
@@ -48,9 +49,11 @@ export default function SignUpScreen() {
 
                 <View style={styles.form}>
                     <TouchableOpacity style={styles.imageContainer} onPress={pickImage}>
-                        <View style={styles.placeholderImage}>
-                            <Text style={styles.placeholderText}>+</Text>
-                        </View>
+                        {profile ? (<Image source={{ uri: profile }} style={styles.profile}/>
+                        ) : (
+                            <View style={styles.placeholderImage}>
+                                <Text style={styles.placeholderText}>+</Text>
+                            </View>)}
                         <View style={styles.editBadge}>
                             <Text style={styles.editText}>Edit</Text>
                         </View>
@@ -116,6 +119,11 @@ const styles = StyleSheet.create({
         marginBottom: 32,
         position: 'relative',
     },
+    profile:{
+        width:120,
+        height:120,
+        borderRadius:60,
+    },
     placeholderImage: {
         width: 120,
         height: 120,
@@ -161,7 +169,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 16,
         alignItems: "center",
-        width:'100%'
+        width: '100%'
     },
     buttonText: {
         color: "#fff",
