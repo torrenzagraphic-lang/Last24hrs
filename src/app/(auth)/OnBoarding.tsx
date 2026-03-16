@@ -1,5 +1,6 @@
+import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
@@ -7,7 +8,31 @@ export default function SignUpScreen() {
 
     const [name, setName] = useState("");
     const [username, setUsername] = useState("");
-    const [isloading, setIsLoading] = useState();
+    const [isloading, setIsLoading] = useState("");
+    const [profile, setProfile] = useState("");
+
+    const pickImage = async() =>{
+        const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if(status !== 'granted'){
+            Alert.alert(
+                "Permission needed",
+                "We need camera roll permission to select a profile image."
+            );
+            return;
+        }
+
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes:['images'],
+            allowsEditing:true,
+            aspect:[1,1],
+            quality:0.8,
+        });
+        if(!result.canceled && result.assets[0]){
+            setProfile(result.assets[0].uri)
+        }
+    }
+
     const handleComplete = () => {
 
     };
@@ -22,7 +47,7 @@ export default function SignUpScreen() {
                 </View>
 
                 <View style={styles.form}>
-                    <TouchableOpacity style={styles.imageContainer}>
+                    <TouchableOpacity style={styles.imageContainer} onPress={pickImage}>
                         <View style={styles.placeholderImage}>
                             <Text style={styles.placeholderText}>+</Text>
                         </View>
