@@ -1,36 +1,54 @@
-import React from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 export default function SignUpScreen() {
 
-    
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const router = useRouter();
+    const {signUp} = useAuth();
+    const handleSignUp = async () =>{
+        if(!email || !password){
+            Alert.alert('Error',"Please fill in all fields")
+        }
 
+        if(password && password.length < 3){
+            Alert.alert("Error",'Please enter a password minimum 4 chr')
+        }
+    } 
     return (
         <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
             <View style={styles.content}>
-                <Text style={styles.title}>Welcome Sign</Text>
-                <Text style={styles.subtitle}>Sign In to continue</Text>
+                <Text style={styles.title}>Create Account</Text>
+                <Text style={styles.subtitle}>Sign up to get started</Text>
                 <View style={styles.form}>
 
                     <TextInput placeholder='Email...' placeholderTextColor={'#999'} keyboardType='email-address'
                         autoComplete='email'
                         autoCapitalize='none'
+                        value={email}
+                        onChangeText={setEmail}
                         style={styles.input} />
 
 
                     <TextInput placeholder='Password...' placeholderTextColor={'#999'}
-                        autoComplete='email'
+                        autoComplete='password'
                         secureTextEntry
                         autoCapitalize='none'
+                        value={password}
+                        onChangeText={setPassword}
                         style={styles.input} />
-                    <TouchableOpacity style={styles.button}>
-                        <Text style={styles.buttonText}>Sign In </Text>
+
+                    <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+                        <Text style={styles.buttonText}>Sign up </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.LinkButton} >
-                        <Text style={styles.LinkButtonTextL}>Don't have an account?
-                            <Text style={styles.LinkButtonText}> Sign Up</Text>
+                    <TouchableOpacity style={styles.LinkButton} onPress={() => router.push('/(auth)/Login')}>
+                        <Text style={styles.LinkButtonTextL}>Already have an account!
+                            <Text style={styles.LinkButtonText}> Sign In</Text>
                         </Text>
                     </TouchableOpacity>
 
@@ -72,25 +90,25 @@ const styles = StyleSheet.create({
         borderColor: "#e0e0e0"
     },
     button: {
-        backgroundColor:"#0989f1",
-        borderRadius:12,
-        padding:16,
-        alignItems:"center",
+        backgroundColor: "#0989f1",
+        borderRadius: 12,
+        padding: 16,
+        alignItems: "center",
     },
-    buttonText:{
-        color:"#fff",
-        fontSize:16,
-        fontWeight:600,
+    buttonText: {
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: 600,
     },
     LinkButton: {
-        marginTop:24,
-        alignItems:'center',
+        marginTop: 24,
+        alignItems: 'center',
     },
-    LinkButtonTextL:{
-        color:'#666'
+    LinkButtonTextL: {
+        color: '#666'
     },
-    LinkButtonText:{
-        color:"#0989f1",
-        fontWeight:'bold'
+    LinkButtonText: {
+        color: "#0989f1",
+        fontWeight: 'bold'
     }
 })
