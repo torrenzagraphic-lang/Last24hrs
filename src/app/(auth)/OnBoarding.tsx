@@ -1,10 +1,16 @@
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 export default function SignUpScreen() {
 
+    const [name, setName] = useState("");
+    const [username, setUsername] = useState("");
+    const [isloading, setIsLoading] = useState();
+    const handleComplete = () => {
+
+    };
     return (
         <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
             <View style={styles.content}>
@@ -15,16 +21,41 @@ export default function SignUpScreen() {
                     </Text>
                 </View>
 
-            <View style={styles.form}>
-                <TouchableOpacity style={styles.imageContainer}>
-                    <View style={styles.placeholderImage}>
-                        <Text style={styles.placeholderText}>+</Text>
-                    </View>
-                    <View style={styles.editBadge}> 
-                        <Text style={styles.editText}>Edit</Text>
-                    </View>
-                </TouchableOpacity>
-            </View>
+                <View style={styles.form}>
+                    <TouchableOpacity style={styles.imageContainer}>
+                        <View style={styles.placeholderImage}>
+                            <Text style={styles.placeholderText}>+</Text>
+                        </View>
+                        <View style={styles.editBadge}>
+                            <Text style={styles.editText}>Edit</Text>
+                        </View>
+                    </TouchableOpacity>
+
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Full Name'
+                        placeholderTextColor={'#999'}
+                        value={name}
+                        onChangeText={setName}
+                        autoCapitalize='words'
+                    />
+
+                    <TextInput
+                        style={styles.input}
+                        placeholder='UserName'
+                        placeholderTextColor={'#999'}
+                        value={username}
+                        onChangeText={setUsername}
+                        autoCapitalize='words'
+                    />
+                    <TouchableOpacity style={styles.button} onPress={handleComplete}>
+                        {isloading ? (
+                            <ActivityIndicator size={24} color='#fff' />
+                        ) : (
+                            <Text style={styles.buttonText}>Good 2 Go </Text>
+                        )}
+                    </TouchableOpacity>
+                </View>
             </View>
         </SafeAreaView>
     )
@@ -54,41 +85,41 @@ const styles = StyleSheet.create({
     },
     form: {
         width: "100%",
-        alignItems:'center',
+        alignItems: 'center',
     },
-    imageContainer:{
-        marginBottom:32,
-        position:'relative',
+    imageContainer: {
+        marginBottom: 32,
+        position: 'relative',
     },
-    placeholderImage:{
-        width:120,
-        height:120,
-        backgroundColor:'#f5f5f5',
-        borderRadius:60,
-        justifyContent:'center',
-        alignItems:'center',
-        position:'relative',
-        borderWidth:2,
-        borderColor:'#e0e0e0',
-        borderStyle:'dashed'
+    placeholderImage: {
+        width: 120,
+        height: 120,
+        backgroundColor: '#f5f5f5',
+        borderRadius: 60,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+        borderWidth: 2,
+        borderColor: '#e0e0e0',
+        borderStyle: 'dashed'
     },
-    placeholderText:{
-        fontSize:48,
-        color:'#999'
+    placeholderText: {
+        fontSize: 48,
+        color: '#999'
     },
-    editBadge:{
-        position:'absolute',
-        bottom:0,
-        right:0,
-        backgroundColor:'#0989f1',
-        paddingHorizontal:12,
-        paddingVertical:6,
-        borderRadius:16,
+    editBadge: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: '#0989f1',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 16,
     },
-    editText:{
-        color:'#fff',
-        fontSize:12,
-        fontWeight:'600',
+    editText: {
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: '600',
     },
     input: {
         backgroundColor: "#f5f5f5",
@@ -97,13 +128,15 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: "#e0e0e0"
+        borderColor: "#e0e0e0",
+        width: '100%'
     },
     button: {
         backgroundColor: "#0989f1",
         borderRadius: 12,
         padding: 16,
         alignItems: "center",
+        width:'100%'
     },
     buttonText: {
         color: "#fff",
