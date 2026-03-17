@@ -7,16 +7,21 @@ function RouteGuard() {
   const { user } = useAuth();
   const segments = useSegments();
 
-  const inAuthGroup = segments[0] === "(auth)";
-  const inTabsGroup = segments[0] === "(tabs)";
+  const segment = segments[0];
+  const inAuthGroup = segment === "(auth)";
+  const inTabsGroup = segment === "(tabs)";
 
   useEffect(() => {
     if (!user) {
-      router.replace("/(auth)/Login");
+      if (!inAuthGroup) {
+        router.replace("/(auth)/Login");
+      }
     } else {
-      router.replace("/(tabs)");
+      if (!inTabsGroup) {
+        router.replace("/(tabs)");
+      }
     }
-  }, []);
+  }, [user, segments, router]);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
