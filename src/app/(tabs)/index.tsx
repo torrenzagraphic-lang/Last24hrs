@@ -1,11 +1,11 @@
 import * as ImagePicker from "expo-image-picker";
-import { useRouter } from "expo-router";
+import { useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
-  const router = useRouter();
-
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -23,6 +23,8 @@ export default function Index() {
       quality: 0.8,
     });
     if (!result.canceled && result.assets[0]) {
+      setPreviewImage(result.assets[0].uri);
+      setShowPreview(true);
     }
   };
 
@@ -42,6 +44,8 @@ export default function Index() {
       quality: 0.8,
     });
     if (!result.canceled && result.assets[0]) {
+      setPreviewImage(result.assets[0].uri);
+      setShowPreview(true);
     }
   };
 
