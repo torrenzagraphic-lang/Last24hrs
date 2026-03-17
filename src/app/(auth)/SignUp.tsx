@@ -1,6 +1,6 @@
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -14,9 +14,7 @@ export default function SignUpScreen() {
     const router = useRouter();
     const { signUp } = useAuth();
 
-    useEffect(()=>{
-        router.push('/(auth)/OnBoarding')
-    },[])
+
 
     const handleSignUp = async () => {
         if (!email || !password) {
@@ -30,6 +28,7 @@ export default function SignUpScreen() {
         SetIsLoading(true);
         try {
             await signUp(email, password);
+            router.push('/(auth)/OnBoarding')
         } catch (error) {
             Alert.alert("Error", "Failed to sign Up. Please try again")
         }
