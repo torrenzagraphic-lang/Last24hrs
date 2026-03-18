@@ -4,7 +4,7 @@ import { AuthProvider, useAuth } from "../context/AuthContext";
 
 function RouteGuard() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const segments = useSegments();
 
   const segment = segments[0];
@@ -12,6 +12,8 @@ function RouteGuard() {
   const inTabsGroup = segment === "(tabs)";
 
   useEffect(() => {
+    if (loading) return;
+
     if (!user) {
       if (!inAuthGroup) {
         router.replace("/(auth)/Login");
@@ -21,7 +23,7 @@ function RouteGuard() {
         router.replace("/(tabs)");
       }
     }
-  }, [user, segments, router]);
+  }, [user, loading, segments, router]);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>

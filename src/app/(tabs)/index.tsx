@@ -62,6 +62,9 @@ export default function Index() {
       <TouchableOpacity style={styles.fab} onPress={showImagePicker}>
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
+
+    
+
     </SafeAreaView>
   );
 }
