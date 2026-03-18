@@ -28,9 +28,13 @@ export const usePost = () => {
             }).select()
             .single();
 
+            if(error){
+                console.error("Error creating post:",error)
+                throw error;
+            }
+
         } catch (error) {
-            console.error("Error creating post:",error)
-            throw error;
+            
         }
 
     };
