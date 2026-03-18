@@ -1,11 +1,21 @@
+import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
+import {
+  Alert,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   const [showPreview, setShowPreview] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [description, setDescription] = useState<string>("");
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -63,8 +73,40 @@ export default function Index() {
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
 
-    
-
+      <Modal visible={true} transparent animationType="fade">
+        <View style={styles.modalCont}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Preview Your image</Text>
+            {previewImage && (
+              <Image
+                style={styles.previewImage}
+                source={{ uri: previewImage }}
+                contentFit="cover"
+              />
+            )}
+            <TextInput
+              style={styles.descriptionInput}
+              placeholder="Add a description (optional)"
+              placeholderTextColor="#999"
+              value={description}
+              onChangeText={setDescription}
+              multiline
+              maxLength={500}
+              textAlignVertical="top"
+            />
+            <View style={styles.modalButton}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalButton, styles.postButton]}>
+                <Text style={styles.postButtonText}>Post</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -97,4 +139,26 @@ const styles = StyleSheet.create({
     fontWeight: 300,
     lineHeight: 32,
   },
+  modalCont: {
+    flex:1,
+    backgroundColor:'rgba(0, 0, 0, 0.8)',
+    justifyContent:'center',
+    alignItems:'center',
+    padding:24,
+  },
+  modalContent: {
+    backgroundColor:'#fff',
+    borderRadius:16,
+    padding:24,
+    width:'100%',
+    maxWidth:400,
+  },
+  modalTitle: {},
+  previewImage: {},
+  descriptionInput: {},
+  modalButton: {},
+  cancelButton: {},
+  cancelButtonText: {},
+  postButton: {},
+  postButtonText: {},
 });
