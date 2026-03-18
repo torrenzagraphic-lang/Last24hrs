@@ -35,6 +35,7 @@ export default function Index() {
     if (!result.canceled && result.assets[0]) {
       setPreviewImage(result.assets[0].uri);
       setShowPreview(true);
+      setDescription("");
     }
   };
 
@@ -56,6 +57,7 @@ export default function Index() {
     if (!result.canceled && result.assets[0]) {
       setPreviewImage(result.assets[0].uri);
       setShowPreview(true);
+      setDescription("");
     }
   };
 
@@ -73,7 +75,7 @@ export default function Index() {
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
 
-      <Modal visible={true} transparent animationType="fade">
+      <Modal visible={showPreview} transparent animationType="fade">
         <View style={styles.modalCont}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Preview Your image</Text>
@@ -94,9 +96,14 @@ export default function Index() {
               maxLength={500}
               textAlignVertical="top"
             />
-            <View style={styles.modalButton}>
+            <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={[styles.modalButton, styles.cancelButton]}
+                onPress={()=>{
+                  setShowPreview(false);
+                  setPreviewImage(null);
+                  setDescription('');
+                }}
               >
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
@@ -153,12 +160,55 @@ const styles = StyleSheet.create({
     width:'100%',
     maxWidth:400,
   },
-  modalTitle: {},
-  previewImage: {},
-  descriptionInput: {},
-  modalButton: {},
-  cancelButton: {},
-  cancelButtonText: {},
-  postButton: {},
-  postButtonText: {},
+  modalTitle: {
+    fontSize:20,
+    fontWeight:'bold',
+    marginBottom:16,
+    textAlign:'center',
+  },
+  previewImage: {
+    width:'100%',
+    aspectRatio:1,
+    borderRadius:12,
+    marginBottom:16
+  },
+  descriptionInput: {
+    width:'100%',
+    minHeight:80,
+    maxHeight:120,
+    backgroundColor: '#f5f5f5',
+    borderRadius:12,
+    padding:12,
+    fontSize:16,
+    marginBottom:24,
+    borderWidth:1,
+    borderColor:'#e0e0e0',
+    color:'#000'
+  },
+  modalButtons: {
+    flexDirection:'row',
+    gap:12,
+  },
+  modalButton:{
+    flex:1,
+    padding:16,
+    borderRadius:12,
+    alignItems:'center',
+  },
+  cancelButton: {
+    backgroundColor:'#f5f5f5',
+  },
+  cancelButtonText: {
+    color:'#000',
+    fontSize:16,
+    fontWeight:'600',
+  },
+  postButton: {
+    backgroundColor:"#0989f1",
+  },
+  postButtonText: {
+    color:'#fff',
+    fontWeight:'600',
+    fontSize:16.
+  },
 });
