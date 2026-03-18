@@ -57,7 +57,12 @@ export const usePost = () => {
                 return;
             }
 
-            console.log(postsData);
+            const postWithProfiles = postsData.map((post)=>({
+                ...post,
+                profiles: post.profiles || null,
+            }))
+
+            setPosts(postWithProfiles)
         } catch (error) {
             console.error("error in loadPost", error);
         } finally {
@@ -96,5 +101,5 @@ export const usePost = () => {
         } catch (error) { }
     };
 
-    return { createPost };
+    return { createPost, posts };
 };

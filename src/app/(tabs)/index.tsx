@@ -1,6 +1,8 @@
-import { usePost } from "@/hooks/usePost";
+import { useAuth } from "@/context/AuthContext";
+import { Post, usePost } from "@/hooks/usePost";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
@@ -9,9 +11,20 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+
+interface PostCardProps{
+  post: Post;
+  currentUserId?: string;
+}
+
+
+const PostCard = ({post, currentUserId}: PostCardProps) =>{
+
+}
 
 export default function Index() {
   const [showPreview, setShowPreview] = useState(false);
@@ -19,8 +32,9 @@ export default function Index() {
   const [description, setDescription] = useState<string>("");
 
   const [isUploading, setIsUploading] = useState(false);
-
-  const { createPost } = usePost();
+  const router = useRouter()
+  const { createPost, posts } = usePost();
+  const {user} = useAuth()
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -90,11 +104,18 @@ export default function Index() {
     }
   };
 
+
+  // const renderPost = ({item}: {item: Post}) => (
+  //   // <PostCard post={item}/>
+  // )
+
   return (
     <SafeAreaView style={styles.container} edges={["bottom", "top"]}>
 
 
- 
+    {/* list */}
+
+    {/* <FlatList data={posts} renderItem={renderPost}/> */}
 
       <TouchableOpacity style={styles.fab} onPress={showImagePicker}>
         <Text style={styles.fabText}>+</Text>
