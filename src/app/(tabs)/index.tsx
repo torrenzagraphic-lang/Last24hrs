@@ -17,6 +17,9 @@ export default function Index() {
   const [showPreview, setShowPreview] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [description, setDescription] = useState<string>("");
+
+  const [isUploading, setIsUploading] = useState(false);
+
   const { createPost } = usePost();
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -82,10 +85,17 @@ export default function Index() {
       console.error("Error creating post:", error);
       Alert.alert("Error", "Failed to create post. Please try again later.");
     }
+    finally{
+      setIsUploading(false);
+    }
   };
 
   return (
     <SafeAreaView style={styles.container} edges={["bottom", "top"]}>
+
+
+ 
+
       <TouchableOpacity style={styles.fab} onPress={showImagePicker}>
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
