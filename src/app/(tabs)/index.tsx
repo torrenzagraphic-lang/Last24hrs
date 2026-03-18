@@ -1,3 +1,4 @@
+import { usePost } from "@/hooks/usePost";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
@@ -16,6 +17,7 @@ export default function Index() {
   const [showPreview, setShowPreview] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [description, setDescription] = useState<string>("");
+  const { createPost } = usePost();
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -69,6 +71,19 @@ export default function Index() {
     ]);
   };
 
+  const handlePost = async () => {
+    if (!previewImage) return;
+    try {
+      await createPost(previewImage, description);
+      setPreviewImage(null);
+      setDescription("");
+      setShowPreview(false);
+    } catch (error) {
+      console.error("Error creating post:", error);
+      Alert.alert("Error", "Failed to create post. Please try again later.");
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={["bottom", "top"]}>
       <TouchableOpacity style={styles.fab} onPress={showImagePicker}>
@@ -99,15 +114,18 @@ export default function Index() {
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={[styles.modalButton, styles.cancelButton]}
-                onPress={()=>{
+                onPress={() => {
                   setShowPreview(false);
                   setPreviewImage(null);
-                  setDescription('');
+                  setDescription("");
                 }}
               >
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalButton, styles.postButton]}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.postButton]}
+                onPress={handlePost}
+              >
                 <Text style={styles.postButtonText}>Post</Text>
               </TouchableOpacity>
             </View>
@@ -147,68 +165,68 @@ const styles = StyleSheet.create({
     lineHeight: 32,
   },
   modalCont: {
-    flex:1,
-    backgroundColor:'rgba(0, 0, 0, 0.8)',
-    justifyContent:'center',
-    alignItems:'center',
-    padding:24,
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
   },
   modalContent: {
-    backgroundColor:'#fff',
-    borderRadius:16,
-    padding:24,
-    width:'100%',
-    maxWidth:400,
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 24,
+    width: "100%",
+    maxWidth: 400,
   },
   modalTitle: {
-    fontSize:20,
-    fontWeight:'bold',
-    marginBottom:16,
-    textAlign:'center',
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 16,
+    textAlign: "center",
   },
   previewImage: {
-    width:'100%',
-    aspectRatio:1,
-    borderRadius:12,
-    marginBottom:16
+    width: "100%",
+    aspectRatio: 1,
+    borderRadius: 12,
+    marginBottom: 16,
   },
   descriptionInput: {
-    width:'100%',
-    minHeight:80,
-    maxHeight:120,
-    backgroundColor: '#f5f5f5',
-    borderRadius:12,
-    padding:12,
-    fontSize:16,
-    marginBottom:24,
-    borderWidth:1,
-    borderColor:'#e0e0e0',
-    color:'#000'
+    width: "100%",
+    minHeight: 80,
+    maxHeight: 120,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    color: "#000",
   },
   modalButtons: {
-    flexDirection:'row',
-    gap:12,
+    flexDirection: "row",
+    gap: 12,
   },
-  modalButton:{
-    flex:1,
-    padding:16,
-    borderRadius:12,
-    alignItems:'center',
+  modalButton: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: "center",
   },
   cancelButton: {
-    backgroundColor:'#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   cancelButtonText: {
-    color:'#000',
-    fontSize:16,
-    fontWeight:'600',
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "600",
   },
   postButton: {
-    backgroundColor:"#0989f1",
+    backgroundColor: "#0989f1",
   },
   postButtonText: {
-    color:'#fff',
-    fontWeight:'600',
-    fontSize:16.
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 16,
   },
 });
