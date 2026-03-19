@@ -40,6 +40,10 @@ export const usePost = () => {
         setIsLoading(true);
 
         try {
+
+           
+
+
             const { data: postsData, error: postError } = await supabase
                 .from("posts")
                 .select(
@@ -87,6 +91,18 @@ export const usePost = () => {
             const now = new Date();
             const expireAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
+
+             const {error: deactivateError} = await supabase
+            .from('posts')
+            .update({is_active: false})
+            .eq('user_id',user.id)
+            .eq('is_active',true)
+            .limit(1);
+
+            if(deactivateError){
+                console.error("Error deactivate old post",deactivateError)
+            }
+
             const { error } = await supabase
                 .from("posts")
                 .insert({
@@ -103,7 +119,9 @@ export const usePost = () => {
                     throw error;
                 }
                 await loadPosts();
-        } catch (error) { }
+        } catch (error) {
+            console.error("Error in createPost:", error);
+         }
     };
 
     return { createPost, posts };
