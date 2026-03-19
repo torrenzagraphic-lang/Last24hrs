@@ -24,10 +24,15 @@ export const usePost = () => {
     const [posts, setPosts] = useState<Post[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const { user } = useAuth();
+    
+    console.log("USER:", user);
+  console.log("POSTS:", posts);
 
-    useEffect(() => {
+ useEffect(() => {
+    if (user) {
         loadPosts();
-    }, []);
+    }
+}, [user]);
 
     const loadPosts = async () => {
         if (!user) return;
@@ -93,11 +98,11 @@ export const usePost = () => {
                 })
                 .select()
                 .single();
-
-            if (error) {
-                console.error("Error creating post:", error);
-                throw error;
-            }
+                if (error) {
+                    console.error("Error creating post:", error);
+                    throw error;
+                }
+                await loadPosts();
         } catch (error) { }
     };
 
