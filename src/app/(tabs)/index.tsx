@@ -8,6 +8,7 @@ import {
   Alert,
   FlatList,
   Modal,
+  RefreshControl,
   StyleSheet,
   Text,
   TextInput,
@@ -78,20 +79,34 @@ export default function Index() {
   const [showPreview, setShowPreview] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [description, setDescription] = useState<string>("");
-
   const [isUploading, setIsUploading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false)
+
+
   const router = useRouter();
-  const { createPost, posts } = usePost();
+  const { createPost, posts, refreshPosts } = usePost();
   const { user } = useAuth();
 
   const userActivePost = posts.find(
     (post) =>
       post.user_id === user?.id &&
-    post.is_active &&
-    new Date(post.expires_at) > new Date(),
+      post.is_active &&
+      new Date(post.expires_at) > new Date(),
   );
 
   const hasActivePost = !!userActivePost;
+
+  const onRefresh = async() =>{
+    setRefreshing(true);
+    try {
+      await refreshPosts();
+    } catch (error) {
+      console.error("Error refreshing posts:",error)
+    }
+    finally{
+      setRefreshing(false)
+    }
+  }
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -169,7 +184,18 @@ export default function Index() {
     <SafeAreaView style={styles.container} edges={["bottom", "top"]}>
       {/* list */}
 
-      <FlatList data={posts} renderItem={renderPost} />
+      <FlatList
+        data={posts}
+        renderItem={renderPost}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={
+          posts.length === 0 ? styles.emptyContent : styles.content
+        }
+        ListEmptyComponent={
+          <Text>no post founds</Text>
+        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
+      />
 
       <TouchableOpacity style={styles.fab} onPress={showImagePicker}>
         <Text style={styles.fabText}>{hasActivePost ? "↻" : "+"}</Text>
@@ -179,7 +205,7 @@ export default function Index() {
         <View style={styles.modalCont}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>
-              {hasActivePost ? 'Replace Your Post' : "Preview Your Post"}
+              {hasActivePost ? "Replace Your Post" : "Preview Your Post"}
             </Text>
             {previewImage && (
               <Image
@@ -187,9 +213,8 @@ export default function Index() {
                 source={{ uri: previewImage }}
                 contentFit="cover"
               />
-              
             )}
-            
+
             <TextInput
               style={styles.descriptionInput}
               placeholder="Add a description (optional)"
@@ -215,7 +240,9 @@ export default function Index() {
                 style={[styles.modalButton, styles.postButton]}
                 onPress={handlePost}
               >
-                <Text style={styles.postButtonText}>{hasActivePost ? 'Replace' : "Post"}</Text>
+                <Text style={styles.postButtonText}>
+                  {hasActivePost ? "Replace" : "Post"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -317,6 +344,16 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
     fontSize: 16,
+  },
+  content:{
+    padding:16,
+    paddingBottom:100,
+  },
+  emptyContent:{
+    flex:1,
+    justifyContent:'center',
+    alignItems:'center',
+    padding:16,
   },
   postContainer: {
     backgroundColor: "#fff",

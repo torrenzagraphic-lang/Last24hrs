@@ -24,15 +24,14 @@ export const usePost = () => {
     const [posts, setPosts] = useState<Post[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const { user } = useAuth();
-    
-    console.log("USER:", user);
-  console.log("POSTS:", posts);
 
- useEffect(() => {
-    if (user) {
-        loadPosts();
-    }
-}, [user]);
+
+
+    useEffect(() => {
+        if (user) {
+            loadPosts();
+        }
+    }, [user]);
 
     const loadPosts = async () => {
         if (!user) return;
@@ -41,7 +40,7 @@ export const usePost = () => {
 
         try {
 
-           
+
 
 
             const { data: postsData, error: postError } = await supabase
@@ -66,7 +65,7 @@ export const usePost = () => {
                 return;
             }
 
-            const postWithProfiles = postsData.map((post)=>({
+            const postWithProfiles = postsData.map((post) => ({
                 ...post,
                 profiles: post.profiles || null,
             }))
@@ -92,15 +91,15 @@ export const usePost = () => {
             const expireAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
 
-             const {error: deactivateError} = await supabase
-            .from('posts')
-            .update({is_active: false})
-            .eq('user_id',user.id)
-            .eq('is_active',true)
-            .limit(1);
+            const { error: deactivateError } = await supabase
+                .from('posts')
+                .update({ is_active: false })
+                .eq('user_id', user.id)
+                .eq('is_active', true);
+                
 
-            if(deactivateError){
-                console.error("Error deactivate old post",deactivateError)
+            if (deactivateError) {
+                console.error("Error deactivate old post", deactivateError)
             }
 
             const { error } = await supabase
@@ -114,15 +113,20 @@ export const usePost = () => {
                 })
                 .select()
                 .single();
-                if (error) {
-                    console.error("Error creating post:", error);
-                    throw error;
-                }
-                await loadPosts();
+            if (error) {
+                console.error("Error creating post:", error);
+                throw error;
+            }
+            await loadPosts();
         } catch (error) {
             console.error("Error in createPost:", error);
-         }
+        }
     };
 
-    return { createPost, posts };
+
+    const refreshPosts = async() =>{
+        await loadPosts();
+    }
+
+    return { createPost, posts, refreshPosts };
 };
