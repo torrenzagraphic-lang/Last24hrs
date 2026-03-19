@@ -10,6 +10,7 @@ export interface User {
     onboardingCompleted?: boolean;
 }
 
+
 interface AuthContextType {
     user: User | null;
     loading: boolean;
