@@ -1,5 +1,11 @@
-import { supabase } from "@/lib/supabase/Client";
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { supabase } from '@/lib/supabase/Client';
+import {
+    createContext,
+    ReactNode,
+    useContext,
+    useEffect,
+    useState,
+} from 'react';
 
 export interface User {
     id: string;
@@ -10,58 +16,61 @@ export interface User {
     onboardingCompleted?: boolean;
 }
 
-
 interface AuthContextType {
     user: User | null;
     loading: boolean;
     signUp: (email: string, password: string) => Promise<void>;
     signIn: (email: string, password: string) => Promise<void>;
     updateUser: (userData: Partial<User>) => Promise<void>;
+     signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true); 
+    const [loading, setLoading] = useState(true);
 
-        useEffect(()=>{
-            CheckSession();
-        }, [])
+    useEffect(() => {
+        CheckSession();
+    }, []);
 
-    const CheckSession = async() =>{
+
+      const signOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  };
+
+    const CheckSession = async () => {
         try {
             const {
-                data:{session},
+                data: { session },
             } = await supabase.auth.getSession();
 
-            if(session?.user){
+            if (session?.user) {
                 const profile = await fetchUserProfile(session.user.id);
                 setUser(profile);
+            } else {
+                setUser(null);
             }
-            else{
-                setUser(null)
-            }
-
         } catch (error) {
-            console.error("Error checking session", error)
+            console.error('Error checking session', error);
             setUser(null);
-        }
-        finally{
+        } finally {
             setLoading(false);
         }
-    }
+    };
 
     const fetchUserProfile = async (userId: string): Promise<User | null> => {
         try {
             const { data, error } = await supabase
-                .from("profiles")
-                .select("*")
-                .eq("id", userId)
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
                 .single();
 
             if (error) {
-                console.error('Error fetching profiles', error)
+                console.error('Error fetching profiles', error);
                 return null;
             }
 
@@ -80,11 +89,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 id: data.id,
                 name: data.name,
                 username: data.username,
-                email: authUser.data.user.email || "",
+                email: authUser.data.user.email || '',
                 profileImage: data.profile_image_url,
                 onboardingCompleted: data.onboarding_completed,
-            }
-
+            };
         } catch (error) {
             console.error('Error in fetchUserProfile:', error);
             return null;
@@ -100,7 +108,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (error) throw error;
 
         if (data.user) {
-            const profile = await fetchUserProfile(data.user.id)
+            const profile = await fetchUserProfile(data.user.id);
             setUser(profile);
         }
     };
@@ -114,7 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (error) throw error;
 
         if (data.user) {
-            const profile = await fetchUserProfile(data.user.id)
+            const profile = await fetchUserProfile(data.user.id);
             setUser(profile);
         }
     };
@@ -133,13 +141,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             if (userData.onboardingCompleted !== undefined)
                 updateData.onboarding_completed = userData.onboardingCompleted;
 
-            const { error } = await supabase
-                .from("profiles")
+            const { error, data } = await supabase
+                .from('profiles')
                 .update(updateData)
-                .eq("id", user.id);
+                .eq('id', user.id)
+                .select()
+                .single();
             if (error) throw error;
+
+            if (data) {
+                const Profile = await fetchUserProfile(data.id);
+                setUser(Profile);
+            }
         } catch (error) {
-            console.error("Error Updating user:", error);
+            console.error('Error Updating user:', error);
             throw error;
         }
 
@@ -151,7 +166,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, signUp, updateUser, signIn, loading }}>
+        <AuthContext.Provider
+            value={{ user, signUp, updateUser, signIn, loading, signOut }}
+        >
             {children}
         </AuthContext.Provider>
     );
@@ -160,7 +177,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (context === undefined) {
-        throw new Error("Must be inside the provider");
+        throw new Error('Must be inside the provider');
     }
     return context;
 };
