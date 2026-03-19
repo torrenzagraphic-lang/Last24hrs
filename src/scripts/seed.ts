@@ -14,6 +14,7 @@ if (fs.existsSync(envLocalPath)) {
     dotenv.config({ path: envLocalPath });
 }
 
+
 const supabaseUrl =
     process.env.EXPO_PUBLIC_SUPABASE_URL ||
     "https://fnnhciiooxgvffbdbwxr.supabase.co";
